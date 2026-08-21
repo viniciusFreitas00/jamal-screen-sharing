@@ -24,10 +24,12 @@ export default function ViewerPage() {
   useEffect(() => {
     const peer = new Peer({ config: { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] } });
     peerRef.current = peer;
+    const liveId = new URLSearchParams(window.location.search).get("id");
+    const queryTimer = liveId ? window.setTimeout(() => setTransmitterId(liveId), 0) : null;
     peer.on("open", () => { setIsReady(true); setStatusKind("ready"); setStatus("Pronto para assistir"); setStatusDetail("Cole o ID do apresentador para solicitar acesso."); });
     peer.on("call", (call) => { mediaCallRef.current = call; call.answer(); call.on("stream", async (stream) => { if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play().catch(() => undefined); } setIsConnected(true); setIsConnecting(false); setStatus("Conectado ao vivo"); setStatusDetail("A transmissão está sendo recebida diretamente do apresentador."); }); call.on("close", () => { setIsConnected(false); setStatus("Transmissão encerrada"); setStatusDetail("O apresentador encerrou a sala."); }); call.on("error", () => { setIsConnected(false); setIsConnecting(false); setStatusKind("error"); setStatus("Falha na transmissão"); setStatusDetail("Não foi possível manter o vídeo conectado."); }); });
     peer.on("error", (error) => { setIsConnecting(false); setStatusKind("error"); setStatus("Erro de conexão"); setStatusDetail(error.message); });
-    return () => { if (heartbeatRef.current) clearInterval(heartbeatRef.current); dataConnectionRef.current?.close(); mediaCallRef.current?.close(); peer.destroy(); };
+    return () => { if (queryTimer) clearTimeout(queryTimer); if (heartbeatRef.current) clearInterval(heartbeatRef.current); dataConnectionRef.current?.close(); mediaCallRef.current?.close(); peer.destroy(); };
   }, []);
 
   const connect = (event: FormEvent<HTMLFormElement>) => {
