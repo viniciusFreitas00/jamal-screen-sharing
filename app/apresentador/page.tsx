@@ -19,12 +19,38 @@ export default function PresenterPage() {
   const [viewerCount, setViewerCount] = useState(0);
   const [isStarting, setIsStarting] = useState(false);
   const [isLive, setIsLive] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const previewRef = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<Peer | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const captureCleanupRef = useRef<(() => void) | null>(null);
   const callsRef = useRef(new Map<string, MediaConnection>());
   const viewersRef = useRef(new Set<string>());
+  const isStoppingRef = useRef(false);
+
+  const stopBroadcast = () => {
+    if (isStoppingRef.current) return;
+    isStoppingRef.current = true;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    captureCleanupRef.current?.();
+    callsRef.current.forEach((call) => call.close());
+    callsRef.current.clear();
+    viewersRef.current.clear();
+    peerRef.current?.destroy();
+    streamRef.current = null;
+    captureCleanupRef.current = null;
+    peerRef.current = null;
+    if (previewRef.current) previewRef.current.srcObject = null;
+    setViewerCount(0);
+    setIsStarting(false);
+    setIsLive(false);
+    setPeerId("");
+    setIsCopied(false);
+    setStatusKind("idle");
+    setStatus("Transmissão encerrada");
+    setStatusDetail("Você pode iniciar uma nova transmissão.");
+    isStoppingRef.current = false;
+  };
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -51,6 +77,24 @@ export default function PresenterPage() {
     viewersRef.current.delete(id);
     callsRef.current.delete(id);
     updateViewerCount();
+  };
+
+  const copyPeerId = async () => {
+    if (!peerId) return;
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(peerId);
+    } else {
+      const input = document.createElement("textarea");
+      input.value = peerId;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    setIsCopied(true);
+    window.setTimeout(() => setIsCopied(false), 2200);
   };
 
   const captureMedia = async () => {
@@ -88,9 +132,9 @@ export default function PresenterPage() {
         connection.on("close", () => removeViewer(viewerId)); connection.on("error", () => removeViewer(viewerId));
       });
       peer.on("error", (error) => { setStatusKind("error"); setStatus("Falha na conexão"); setStatusDetail(error.message); setIsStarting(false); });
-      captured.stream.getVideoTracks()[0].onended = () => { streamRef.current?.getTracks().forEach((track) => track.stop()); captureCleanupRef.current?.(); peer.destroy(); setIsLive(false); setPeerId(""); setStatusKind("idle"); setStatus("Compartilhamento encerrado"); setStatusDetail("Você pode iniciar uma nova transmissão."); };
+      captured.stream.getVideoTracks()[0].onended = stopBroadcast;
     } catch (error) { setIsStarting(false); setStatusKind("error"); setStatus("Não foi possível iniciar"); setStatusDetail(error instanceof Error ? error.message : "Permissão de captura recusada."); }
   };
 
-  return <div className="app-shell"><header className="topbar"><Link className="brand" href="/"><span className="brand-mark" />tela ao vivo</Link><span className="topbar-note">modo apresentador</span></header><main className="workspace"><div className="workspace-header"><div><p className="eyebrow">sala de transmissão</p><h1>Apresente sua tela.</h1></div><Link className="back-link" href="/">Trocar de modo</Link></div><div className="workspace-grid"><section className="stage"><video ref={previewRef} autoPlay playsInline muted aria-label="Prévia da tela compartilhada" />{!isLive && <div className="stage-empty"><strong>A prévia aparecerá aqui</strong><span>O navegador pedirá sua autorização antes de começar.</span></div>}{isLive && <div className="stage-live"><span className="live-dot" />Ao vivo</div>}</section><aside className="control-panel"><span className="panel-label">Controle da sala</span><div className="status-line"><span className={`status-dot ${statusKind}`} /><div><strong>{status}</strong><span>{statusDetail}</span></div></div><button className="primary-button" type="button" onClick={startBroadcast} disabled={isStarting || isLive}>{isStarting ? "Preparando transmissão..." : isLive ? "Transmissão ativa" : "Iniciar compartilhamento"}</button>{peerId && <div className="share-id"><small>ID para espectadores</small><code>{peerId}</code></div>}<div className="metric-row"><span>Espectadores conectados</span><strong>{String(viewerCount).padStart(2, "0")}</strong></div></aside></div></main></div>;
+  return <div className="app-shell"><header className="topbar"><Link className="brand" href="/"><span className="brand-mark" />tela ao vivo</Link><span className="topbar-note">modo apresentador</span></header><main className="workspace"><div className="workspace-header"><div><p className="eyebrow">sala de transmissão</p><h1>Apresente sua tela.</h1></div><Link className="back-link" href="/">Trocar de modo</Link></div><div className="workspace-grid"><section className="stage"><video ref={previewRef} autoPlay playsInline muted aria-label="Prévia da tela compartilhada" />{!isLive && <div className="stage-empty"><strong>A prévia aparecerá aqui</strong><span>O navegador pedirá sua autorização antes de começar.</span></div>}{isLive && <div className="stage-live"><span className="live-dot" />Ao vivo</div>}</section><aside className="control-panel"><span className="panel-label">Controle da sala</span><div className="status-line"><span className={`status-dot ${statusKind}`} /><div><strong>{status}</strong><span>{statusDetail}</span></div></div><button className="primary-button" type="button" onClick={startBroadcast} disabled={isStarting || isLive}>{isStarting ? "Preparando transmissão..." : isLive ? "Transmissão ativa" : "Iniciar compartilhamento"}</button>{isLive && <button className="stop-button" type="button" onClick={stopBroadcast}>Encerrar transmissão</button>}{peerId && <div className="share-id"><small>ID para espectadores</small><div className="share-id-row"><code>{peerId}</code><button className="copy-button" type="button" onClick={copyPeerId} aria-label="Copiar ID do apresentador">{isCopied ? "Copiado" : "Copiar ID"}</button></div></div>}<div className="metric-row"><span>Espectadores conectados</span><strong>{String(viewerCount).padStart(2, "0")}</strong></div></aside></div></main></div>;
 }

@@ -182,9 +182,14 @@ button:disabled {
 .status-line span { color: var(--ink-soft); display: block; font-size: 0.82rem; line-height: 1.45; margin-top: 4px; }
 .primary-button { background: var(--signal); border: 1px solid var(--signal); color: #fff8f1; font-size: 0.9rem; font-weight: 650; margin-top: 25px; padding: 15px 18px; transition: background 160ms ease, transform 160ms ease; }
 .primary-button:hover:not(:disabled) { background: var(--signal-dark); transform: translateY(-2px); }
+.stop-button { background: transparent; border: 1px solid #c7a5a0; color: var(--signal-dark); font-size: 0.82rem; font-weight: 650; margin-top: 10px; padding: 12px 18px; }
+.stop-button:hover { background: #f1ddd7; border-color: var(--signal); }
 .share-id { background: var(--panel); border: 1px solid var(--line); margin-top: 26px; padding: 18px; }
 .share-id small { color: var(--ink-soft); display: block; font-size: 0.69rem; letter-spacing: 0.1em; margin-bottom: 9px; text-transform: uppercase; }
-.share-id code { display: block; font-family: var(--font-geist-mono), monospace; font-size: 0.84rem; line-height: 1.5; overflow-wrap: anywhere; }
+.share-id-row { align-items: center; display: flex; gap: 14px; }
+.share-id code { display: block; flex: 1; font-family: var(--font-geist-mono), monospace; font-size: 0.84rem; line-height: 1.5; overflow-wrap: anywhere; }
+.copy-button { background: transparent; border: 1px solid var(--line); color: var(--signal-dark); flex: 0 0 auto; font-size: 0.72rem; font-weight: 650; padding: 8px 10px; }
+.copy-button:hover { background: var(--mint); border-color: var(--mint); color: var(--foreground); }
 .viewer-form { margin-top: 25px; }
 .viewer-form label { color: var(--ink-soft); display: block; font-size: 0.75rem; margin-bottom: 9px; }
 .viewer-form input { background: var(--panel); border: 1px solid var(--line); box-sizing: border-box; color: var(--foreground); font-family: var(--font-geist-mono), monospace; outline: none; padding: 14px; width: 100%; }
