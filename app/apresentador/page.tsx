@@ -138,7 +138,7 @@ export default function PresenterPage() {
   };
 
   const captureMedia = async () => {
-    const screen = await navigator.mediaDevices.getDisplayMedia({ video: { width: { ideal: TARGET_WIDTH, max: TARGET_WIDTH, preferCurrentTab: true }, height: { ideal: TARGET_HEIGHT, max: TARGET_HEIGHT }, frameRate: { ideal: TARGET_FPS, max: TARGET_FPS } }, audio: true });
+    const screen = await navigator.mediaDevices.getDisplayMedia({ video: { width: { ideal: TARGET_WIDTH, max: TARGET_WIDTH }, height: { ideal: TARGET_HEIGHT, max: TARGET_HEIGHT }, frameRate: { ideal: TARGET_FPS, max: TARGET_FPS } }, audio: true });
     let microphone: MediaStream | null = null;
     try { microphone = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); } catch { setStatusDetail("Microfone indisponível. A transmissão seguirá com o áudio da tela."); }
     const audioContext = new AudioContext();
