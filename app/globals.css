@@ -168,6 +168,7 @@ button:disabled {
 .stage { background: #1e2926; min-height: 530px; position: relative; }
 .stage video { display: block; height: 100%; min-height: 530px; object-fit: contain; width: 100%; }
 .stage-empty { align-items: center; color: #b9c5bf; display: flex; flex-direction: column; inset: 0; justify-content: center; padding: 30px; position: absolute; text-align: center; }
+.stage-empty::before { background: url("/jacare.gif") center / contain no-repeat; content: ""; flex: 0 1 260px; height: min(52%, 260px); margin-bottom: 22px; width: min(48%, 200px); }
 .stage-empty strong { color: #f4f1ea; font-size: 1.05rem; font-weight: 500; margin-bottom: 8px; }
 .stage-empty span { font-size: 0.85rem; }
 .stage-live { align-items: center; background: rgba(24, 32, 30, 0.84); color: #f4f1ea; display: flex; font-size: 0.72rem; gap: 8px; left: 15px; letter-spacing: 0.08em; padding: 8px 10px; position: absolute; text-transform: uppercase; top: 15px; }
