@@ -1,21 +1,15 @@
 "use client";
 
-import { MonitorUp, ScreenShare, ScreenShareOff, Users } from "lucide-react";
+import { ScreenShare, ScreenShareOff, Users } from "lucide-react";
 
 import { BroadcastEnded } from "@/components/broadcast-ended";
+import { BroadcastIdle } from "@/components/broadcast-idle";
 import { ControlPanel } from "@/components/control-panel";
 import { ShareLink } from "@/components/share-link";
 import { Stage } from "@/components/stage";
 import { StatusAlert } from "@/components/status-alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
 import { ViewerList } from "@/components/viewer-list";
 
@@ -35,17 +29,10 @@ export function BroadcastRoom() {
         {broadcast.hasEnded ? (
           <BroadcastEnded description="Você pode iniciar uma nova transmissão." />
         ) : (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon" className="bg-background">
-                <MonitorUp />
-              </EmptyMedia>
-              <EmptyTitle>A prévia aparecerá aqui</EmptyTitle>
-              <EmptyDescription>
-                O navegador pedirá sua autorização antes de começar.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <BroadcastIdle
+            title="A prévia aparecerá aqui"
+            description="O navegador pedirá sua autorização antes de começar."
+          />
         )}
       </Stage>
       <div className="flex flex-col gap-6">

@@ -1,18 +1,10 @@
 "use client";
 
-import { Eye } from "lucide-react";
-
 import { BroadcastEnded } from "@/components/broadcast-ended";
+import { BroadcastIdle } from "@/components/broadcast-idle";
 import { ControlPanel } from "@/components/control-panel";
 import { Stage } from "@/components/stage";
 import { StatusAlert } from "@/components/status-alert";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 
 import { JoinForm } from "./join-form";
 import { useViewerSession } from "./use-viewer-session";
@@ -31,15 +23,10 @@ export function ViewerRoom({ initialPresenterId }: { initialPresenterId: string 
         {session.hasEnded ? (
           <BroadcastEnded description="O apresentador encerrou a sala." />
         ) : (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon" className="bg-background">
-                <Eye />
-              </EmptyMedia>
-              <EmptyTitle>A transmissão aparecerá aqui</EmptyTitle>
-              <EmptyDescription>Conecte-se a uma sala para começar a assistir.</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <BroadcastIdle
+            title="A transmissão aparecerá aqui"
+            description="Conecte-se a uma sala para começar a assistir."
+          />
         )}
       </Stage>
       <ControlPanel title="Entrar em uma sala">
