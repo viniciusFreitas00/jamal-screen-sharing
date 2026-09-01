@@ -1,0 +1,250 @@
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.panel-label {
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.11em;
+  padding-bottom: 13px;
+  text-transform: uppercase;
+}
+
+.status-line {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 13px;
+  padding: 21px 0;
+}
+
+.status-line strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.status-line span {
+  color: var(--ink-soft);
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.status-dot {
+  background: var(--signal);
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 9px;
+  margin-top: 5px;
+  width: 9px;
+}
+
+.status-dot.ready {
+  background: var(--ok);
+}
+
+.status-dot.error {
+  background: var(--danger);
+}
+
+.primary-button {
+  background: var(--signal);
+  border: 1px solid var(--signal);
+  color: #fff8f1;
+  font-size: 0.9rem;
+  font-weight: 650;
+  margin-top: 25px;
+  padding: 15px 18px;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--signal-dark);
+  transform: translateY(-2px);
+}
+
+.stop-button {
+  background: transparent;
+  border: 1px solid #c7a5a0;
+  color: var(--signal-dark);
+  font-size: 0.82rem;
+  font-weight: 650;
+  margin-top: 10px;
+  padding: 12px 18px;
+}
+
+.stop-button:hover {
+  background: #f1ddd7;
+  border-color: var(--signal);
+}
+
+.copy-button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--signal-dark);
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 8px 10px;
+}
+
+.copy-button:hover {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--foreground);
+}
+
+.share-id {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  margin-top: 26px;
+  padding: 18px;
+}
+
+.share-id small {
+  color: var(--ink-soft);
+  display: block;
+  font-size: 0.69rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+
+.share-id-row {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.share-id code {
+  display: block;
+  flex: 1;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.viewer-form {
+  margin-top: 25px;
+}
+
+.viewer-form label {
+  color: var(--ink-soft);
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 9px;
+}
+
+.viewer-form input {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-sizing: border-box;
+  color: var(--foreground);
+  font-family: var(--font-geist-mono), monospace;
+  outline: none;
+  padding: 14px;
+  width: 100%;
+}
+
+.viewer-form input:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px rgba(223, 89, 61, 0.12);
+}
+
+.viewer-form .primary-button {
+  width: 100%;
+}
+
+.metric-row {
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.metric-row span {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
+
+.metric-row strong {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.viewer-list {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 18px;
+}
+
+.viewer-list-heading {
+  color: var(--ink-soft);
+  display: flex;
+  font-size: 0.72rem;
+  justify-content: space-between;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.viewer-list-heading strong {
+  color: var(--foreground);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.viewer-item {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  margin-top: 15px;
+  min-width: 0;
+}
+
+.viewer-avatar {
+  align-items: center;
+  background: var(--mint);
+  border-radius: 50%;
+  color: var(--foreground);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  height: 25px;
+  justify-content: center;
+  width: 25px;
+}
+
+.viewer-avatar.offline {
+  background: var(--line);
+  color: var(--ink-soft);
+}
+
+.viewer-name {
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-status {
+  font-size: 0.68rem;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.viewer-status.online {
+  color: var(--online);
+}
+
+.viewer-status.offline {
+  color: var(--ink-soft);
+}

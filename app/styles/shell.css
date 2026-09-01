@@ -1,0 +1,84 @@
+.app-shell {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-shell::before {
+  background: radial-gradient(circle, rgba(223, 89, 61, 0.16) 0 1px, transparent 1.5px);
+  background-size: 18px 18px;
+  content: "";
+  height: 260px;
+  opacity: 0.65;
+  position: absolute;
+  right: -35px;
+  top: -55px;
+  transform: rotate(12deg);
+  width: 320px;
+}
+
+.topbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: var(--shell-width);
+  padding: 28px var(--shell-gutter) 0;
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  align-items: center;
+  color: inherit;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 700;
+  gap: 10px;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  background: var(--signal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(223, 89, 61, 0.12);
+  height: 9px;
+  width: 9px;
+}
+
+.topbar-note {
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  align-items: center;
+  color: var(--signal-dark);
+  display: flex;
+  font-size: 0.73rem;
+  font-weight: 700;
+  gap: 9px;
+  letter-spacing: 0.13em;
+  margin: 0 0 18px;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  background: currentColor;
+  content: "";
+  height: 1px;
+  width: 30px;
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    padding-top: 22px;
+  }
+
+  .topbar-note {
+    display: none;
+  }
+}

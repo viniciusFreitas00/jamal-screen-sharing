@@ -1,0 +1,30 @@
+:root {
+  --background: #f4f1ea;
+  --foreground: #18201e;
+  --ink-soft: #64706b;
+  --line: #d8d9d1;
+  --panel: #fbfaf7;
+  --signal: #df593d;
+  --signal-dark: #b8432d;
+  --mint: #b9d7c5;
+  --stage: #1e2926;
+  --stage-ink: #b9c5bf;
+  --online: #4e8864;
+  --ok: #5d9f76;
+  --danger: #a63d46;
+  --shell-width: 1180px;
+  --shell-gutter: 28px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (max-width: 760px) {
+  :root {
+    --shell-gutter: 20px;
+  }
+}
