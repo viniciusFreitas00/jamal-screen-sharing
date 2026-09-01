@@ -1,29 +1,27 @@
 import type { ReactNode } from "react";
 
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 type ControlPanelProps = {
-  label: string;
+  title: string;
+  action?: ReactNode;
   children: ReactNode;
 };
 
-export function ControlPanel({ label, children }: ControlPanelProps) {
+export function ControlPanel({ title, action, children }: ControlPanelProps) {
   return (
-    <aside className="control-panel">
-      <span className="panel-label">{label}</span>
-      {children}
-    </aside>
-  );
-}
-
-type MetricRowProps = {
-  label: string;
-  value: number;
-};
-
-export function MetricRow({ label, value }: MetricRowProps) {
-  return (
-    <div className="metric-row">
-      <span>{label}</span>
-      <strong>{String(value).padStart(2, "0")}</strong>
-    </div>
+    <Card>
+      <CardHeader className="border-b">
+        <CardTitle>{title}</CardTitle>
+        {action && <CardAction>{action}</CardAction>}
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">{children}</CardContent>
+    </Card>
   );
 }

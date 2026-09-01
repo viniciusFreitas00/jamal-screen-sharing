@@ -10,7 +10,10 @@ export default async function ViewerPage(props: PageProps<"/espectador">) {
 
   return (
     <AppShell note="modo espectador">
-      <Workspace title="Assista de qualquer lugar.">
+      <Workspace
+        title="Assista de qualquer lugar"
+        description="Entre com o ID de uma sala aberta e acompanhe a transmissão ao vivo."
+      >
         <ViewerRoom initialPresenterId={typeof presenterId === "string" ? presenterId : ""} />
       </Workspace>
     </AppShell>

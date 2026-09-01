@@ -1,9 +1,21 @@
 "use client";
 
-import { ControlPanel, MetricRow } from "@/components/control-panel";
+import { MonitorUp, ScreenShare, ScreenShareOff, Users } from "lucide-react";
+
+import { ControlPanel } from "@/components/control-panel";
 import { ShareLink } from "@/components/share-link";
 import { Stage } from "@/components/stage";
-import { StatusLine } from "@/components/status-line";
+import { StatusAlert } from "@/components/status-alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Spinner } from "@/components/ui/spinner";
 import { ViewerList } from "@/components/viewer-list";
 
 import { useBroadcast } from "./use-broadcast";
@@ -19,34 +31,46 @@ export function BroadcastRoom() {
         isLive={broadcast.isLive}
         muted
       >
-        <strong>A prévia aparecerá aqui</strong>
-        <span>O navegador pedirá sua autorização antes de começar.</span>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-background">
+              <MonitorUp />
+            </EmptyMedia>
+            <EmptyTitle>A prévia aparecerá aqui</EmptyTitle>
+            <EmptyDescription>
+              O navegador pedirá sua autorização antes de começar.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       </Stage>
-      <ControlPanel label="Controle da sala">
-        <StatusLine status={broadcast.status} />
-        <button
-          className="primary-button"
-          type="button"
-          onClick={broadcast.start}
-          disabled={broadcast.isStarting || broadcast.isLive}
+      <div className="flex flex-col gap-6">
+        <ControlPanel
+          title="Controle da sala"
+          action={
+            broadcast.isLive ? (
+              <Badge variant="secondary" className="font-mono">
+                <Users />
+                {broadcast.connectedCount}
+              </Badge>
+            ) : undefined
+          }
         >
-          {startLabel(broadcast.isStarting, broadcast.isLive)}
-        </button>
-        {broadcast.isLive && (
-          <button className="stop-button" type="button" onClick={broadcast.stop}>
-            Encerrar transmissão
-          </button>
-        )}
-        {broadcast.presenterId && <ShareLink presenterId={broadcast.presenterId} />}
-        <MetricRow label="Espectadores conectados" value={broadcast.connectedCount} />
+          <StatusAlert status={broadcast.status} />
+          {broadcast.isLive ? (
+            <Button variant="destructive" size="lg" onClick={broadcast.stop}>
+              <ScreenShareOff />
+              Encerrar transmissão
+            </Button>
+          ) : (
+            <Button size="lg" onClick={broadcast.start} disabled={broadcast.isStarting}>
+              {broadcast.isStarting ? <Spinner /> : <ScreenShare />}
+              {broadcast.isStarting ? "Preparando transmissão..." : "Iniciar compartilhamento"}
+            </Button>
+          )}
+          {broadcast.presenterId && <ShareLink presenterId={broadcast.presenterId} />}
+        </ControlPanel>
         <ViewerList viewers={broadcast.viewers} />
-      </ControlPanel>
+      </div>
     </>
   );
-}
-
-function startLabel(isStarting: boolean, isLive: boolean): string {
-  if (isStarting) return "Preparando transmissão...";
-  if (isLive) return "Transmissão ativa";
-  return "Iniciar compartilhamento";
 }
