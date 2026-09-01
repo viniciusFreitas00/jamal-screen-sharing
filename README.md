@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tela ao vivo
 
-## Getting Started
+Compartilhamento de tela com áudio direto no navegador, ponto a ponto (WebRTC via
+[PeerJS](https://peerjs.com)). O vídeo nunca passa por um servidor da aplicação: o servidor de
+sinalização público do PeerJS apenas apresenta os dois lados, e a mídia segue direto entre eles.
 
-First, run the development server:
+## Como rodar
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000), entre em `/apresentador` para transmitir e use
+o link gerado (`/espectador?id=<peer-id>`) para assistir.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Rotas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Rota            | Papel                                                                     |
+| --------------- | ------------------------------------------------------------------------- |
+| `/`             | Escolha do modo (apresentador ou espectador)                              |
+| `/apresentador` | Captura a tela, publica um peer id e envia a mídia para cada espectador   |
+| `/espectador`   | Conecta-se a um peer id, anuncia presença e recebe a transmissão          |
 
-## Learn More
+## Estrutura
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  apresentador/    página, sala e hook de transmissão
+  espectador/      página, sala, formulário de entrada e hook de sessão
+  styles/          folhas de estilo por área da interface
+components/        UI compartilhada entre as rotas
+lib/
+  peer/            opções do peer, protocolo de mensagens, qualidade de vídeo, registro de espectadores
+  screen-capture   captura de tela e mixagem de áudio (tela + microfone)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Cada rota tem uma página de servidor (casca) e um componente cliente com a lógica interativa. Toda a
+conversa com o PeerJS vive nos hooks (`use-broadcast`, `use-viewer-session`); os componentes só
+recebem estado e disparam ações.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Protocolo entre os pares
 
-## Deploy on Vercel
+O canal de dados carrega duas mensagens, definidas em `lib/peer/messages.ts`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `viewer-presence`: enviada uma vez na entrada, com o nome escolhido pelo espectador;
+- `viewer-heartbeat`: enviada a cada 4s para manter a presença.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O apresentador marca como desconectado quem fica 12s sem sinal — necessário porque o evento `close`
+do WebRTC não chega de forma confiável quando a aba do espectador é fechada.
+
+## Decisões de mídia
+
+`lib/video-profile.ts` concentra o alvo de captura (1920x1080, 30fps, 4 Mbps). O encoder recebe
+`degradationPreference: "maintain-resolution"` porque texto legível importa mais que fluidez em
+compartilhamento de tela.
