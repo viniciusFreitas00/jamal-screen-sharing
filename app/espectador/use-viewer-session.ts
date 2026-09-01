@@ -178,5 +178,13 @@ export function useViewerSession() {
     [isReady, startHeartbeat, stopHeartbeat],
   );
 
-  return { videoRef, status, isReady, isConnecting, isWatching, join };
+  return {
+    videoRef,
+    status,
+    hasEnded: status === STATUS.ended,
+    isReady,
+    isConnecting,
+    isWatching,
+    join,
+  };
 }

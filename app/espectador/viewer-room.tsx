@@ -2,6 +2,7 @@
 
 import { Eye } from "lucide-react";
 
+import { BroadcastEnded } from "@/components/broadcast-ended";
 import { ControlPanel } from "@/components/control-panel";
 import { Stage } from "@/components/stage";
 import { StatusAlert } from "@/components/status-alert";
@@ -27,15 +28,19 @@ export function ViewerRoom({ initialPresenterId }: { initialPresenterId: string 
         isLive={session.isWatching}
         controls
       >
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon" className="bg-background">
-              <Eye />
-            </EmptyMedia>
-            <EmptyTitle>A transmissão aparecerá aqui</EmptyTitle>
-            <EmptyDescription>Conecte-se a uma sala para começar a assistir.</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        {session.hasEnded ? (
+          <BroadcastEnded description="O apresentador encerrou a sala." />
+        ) : (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-background">
+                <Eye />
+              </EmptyMedia>
+              <EmptyTitle>A transmissão aparecerá aqui</EmptyTitle>
+              <EmptyDescription>Conecte-se a uma sala para começar a assistir.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
       </Stage>
       <ControlPanel title="Entrar em uma sala">
         <StatusAlert status={session.status} />

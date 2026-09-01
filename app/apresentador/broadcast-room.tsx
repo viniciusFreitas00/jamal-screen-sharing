@@ -2,6 +2,7 @@
 
 import { MonitorUp, ScreenShare, ScreenShareOff, Users } from "lucide-react";
 
+import { BroadcastEnded } from "@/components/broadcast-ended";
 import { ControlPanel } from "@/components/control-panel";
 import { ShareLink } from "@/components/share-link";
 import { Stage } from "@/components/stage";
@@ -31,17 +32,21 @@ export function BroadcastRoom() {
         isLive={broadcast.isLive}
         muted
       >
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon" className="bg-background">
-              <MonitorUp />
-            </EmptyMedia>
-            <EmptyTitle>A prévia aparecerá aqui</EmptyTitle>
-            <EmptyDescription>
-              O navegador pedirá sua autorização antes de começar.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        {broadcast.hasEnded ? (
+          <BroadcastEnded description="Você pode iniciar uma nova transmissão." />
+        ) : (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-background">
+                <MonitorUp />
+              </EmptyMedia>
+              <EmptyTitle>A prévia aparecerá aqui</EmptyTitle>
+              <EmptyDescription>
+                O navegador pedirá sua autorização antes de começar.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
       </Stage>
       <div className="flex flex-col gap-6">
         <ControlPanel

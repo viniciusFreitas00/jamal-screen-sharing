@@ -179,6 +179,7 @@ export function useBroadcast() {
   return {
     previewRef,
     status,
+    hasEnded: status === STATUS.ended,
     presenterId,
     viewers,
     connectedCount,
