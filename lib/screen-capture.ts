@@ -1,63 +1,85 @@
 import { VIDEO_PROFILE } from "@/lib/video-profile";
 
+export type CaptureSource = {
+  video: MediaStreamTrack;
+  isTab: boolean;
+  hasAudio: boolean;
+};
+
 export type ScreenCapture = {
   stream: MediaStream;
-  microphoneAvailable: boolean;
+  selectSource: () => Promise<CaptureSource>;
   stop: () => void;
 };
 
-export async function captureScreenWithAudio(): Promise<ScreenCapture> {
-  const screen = await navigator.mediaDevices.getDisplayMedia({
-    video: {
-      width: { ideal: VIDEO_PROFILE.width, max: VIDEO_PROFILE.width },
-      height: { ideal: VIDEO_PROFILE.height, max: VIDEO_PROFILE.height },
-      frameRate: { ideal: VIDEO_PROFILE.frameRate, max: VIDEO_PROFILE.frameRate },
-    },
-    audio: true,
-  });
+const DISPLAY_MEDIA_OPTIONS: DisplayMediaStreamOptions = {
+  video: {
+    displaySurface: "browser",
+    width: { ideal: VIDEO_PROFILE.width, max: VIDEO_PROFILE.width },
+    height: { ideal: VIDEO_PROFILE.height, max: VIDEO_PROFILE.height },
+    frameRate: { ideal: VIDEO_PROFILE.frameRate, max: VIDEO_PROFILE.frameRate },
+  },
+  audio: true,
+  systemAudio: "exclude",
+  windowAudio: "exclude",
+  selfBrowserSurface: "exclude",
+  surfaceSwitching: "exclude",
+};
 
-  const microphone = await requestMicrophone();
-  const audioContext = new AudioContext();
-  const mixer = mixAudio(audioContext, [audioTracksOf(screen), audioTracksOf(microphone)]);
-  const video = await prepareVideoTrack(screen);
-  const stream = new MediaStream([video, ...mixer.stream.getAudioTracks()]);
+export function createScreenCapture(): ScreenCapture {
+  const context = new AudioContext();
+  const bus = context.createMediaStreamDestination();
+  const stream = new MediaStream(bus.stream.getAudioTracks());
+
+  let source: MediaStream | null = null;
+  let audioInput: MediaStreamAudioSourceNode | null = null;
+
+  function releaseSource(): void {
+    audioInput?.disconnect();
+    audioInput = null;
+    stopTracks(source);
+    source = null;
+  }
+
+  function publishVideo(video: MediaStreamTrack): void {
+    stream.getVideoTracks().forEach((track) => stream.removeTrack(track));
+    stream.addTrack(video);
+  }
+
+  function publishAudio(tracks: MediaStreamTrack[]): void {
+    if (!tracks.length) return;
+    audioInput = context.createMediaStreamSource(new MediaStream(tracks));
+    audioInput.connect(bus);
+  }
 
   return {
     stream,
-    microphoneAvailable: microphone !== null,
+
+    selectSource: async () => {
+      const picked = await navigator.mediaDevices.getDisplayMedia(DISPLAY_MEDIA_OPTIONS);
+      const video = await prepareVideoTrack(picked);
+      const audio = picked.getAudioTracks();
+
+      releaseSource();
+      publishVideo(video);
+      publishAudio(audio);
+      source = picked;
+
+      if (context.state === "suspended") await context.resume();
+
+      return {
+        video,
+        isTab: video.getSettings().displaySurface === "browser",
+        hasAudio: audio.length > 0,
+      };
+    },
+
     stop: () => {
+      releaseSource();
       stopTracks(stream);
-      stopTracks(screen);
-      stopTracks(microphone);
-      void audioContext.close();
+      void context.close();
     },
   };
-}
-
-async function requestMicrophone(): Promise<MediaStream | null> {
-  try {
-    return await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  } catch {
-    return null;
-  }
-}
-
-function audioTracksOf(source: MediaStream | null): MediaStream | null {
-  const tracks = source?.getAudioTracks() ?? [];
-  return tracks.length ? new MediaStream(tracks) : null;
-}
-
-function mixAudio(
-  context: AudioContext,
-  sources: (MediaStream | null)[],
-): MediaStreamAudioDestinationNode {
-  const mixer = context.createMediaStreamDestination();
-
-  sources.forEach((source) => {
-    if (source) context.createMediaStreamSource(source).connect(mixer);
-  });
-
-  return mixer;
 }
 
 async function prepareVideoTrack(screen: MediaStream): Promise<MediaStreamTrack> {

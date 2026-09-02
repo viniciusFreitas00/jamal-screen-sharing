@@ -82,6 +82,12 @@ export class ViewerRegistry {
     return Array.from(this.viewers.values(), (viewer) => viewer.presence);
   }
 
+  liveCalls(): MediaConnection[] {
+    return Array.from(this.viewers.values())
+      .map((viewer) => viewer.call)
+      .filter((call): call is MediaConnection => call !== null);
+  }
+
   private update(id: string, change: (viewer: ViewerRecord) => void): void {
     const viewer = this.viewers.get(id);
     if (viewer) change(viewer);

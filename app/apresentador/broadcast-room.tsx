@@ -1,6 +1,6 @@
 "use client";
 
-import { ScreenShare, ScreenShareOff, Users } from "lucide-react";
+import { Replace, ScreenShare, ScreenShareOff, Users } from "lucide-react";
 
 import { BroadcastEnded } from "@/components/broadcast-ended";
 import { BroadcastIdle } from "@/components/broadcast-idle";
@@ -49,10 +49,21 @@ export function BroadcastRoom() {
         >
           <StatusAlert status={broadcast.status} />
           {broadcast.isLive ? (
-            <Button variant="destructive" size="lg" onClick={broadcast.stop}>
-              <ScreenShareOff />
-              Encerrar transmissão
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={broadcast.switchScreen}
+                disabled={broadcast.isSwitching}
+              >
+                {broadcast.isSwitching ? <Spinner /> : <Replace />}
+                {broadcast.isSwitching ? "Escolhendo a nova tela..." : "Trocar tela"}
+              </Button>
+              <Button variant="destructive" size="lg" onClick={broadcast.stop}>
+                <ScreenShareOff />
+                Encerrar transmissão
+              </Button>
+            </div>
           ) : (
             <Button size="lg" onClick={broadcast.start} disabled={broadcast.isStarting}>
               {broadcast.isStarting ? <Spinner /> : <ScreenShare />}
