@@ -1,11 +1,10 @@
 import type { MediaConnection } from "peerjs";
 
+import { videoSenderOf } from "@/lib/peer/video-sender";
 import { VIDEO_PROFILE } from "@/lib/video-profile";
 
 export async function applyVideoQuality(call: MediaConnection): Promise<void> {
-  const sender = call.peerConnection
-    ?.getSenders()
-    .find((candidate) => candidate.track?.kind === "video");
+  const sender = videoSenderOf(call);
 
   if (!sender) return;
 
