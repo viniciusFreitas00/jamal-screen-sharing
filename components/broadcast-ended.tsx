@@ -1,4 +1,4 @@
-import { VideoOff } from "lucide-react";
+import Image from "next/image";
 
 import {
   Empty,
@@ -12,8 +12,14 @@ export function BroadcastEnded({ description }: { description: string }) {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-background">
-          <VideoOff />
+        <EmptyMedia className="min-h-0 shrink">
+          <Image
+            src="/jacare.png"
+            alt="Jacaré de boné depois do fim da transmissão"
+            width={310}
+            height={242}
+            className="h-auto max-h-48 w-auto max-w-64 rounded-lg object-contain"
+          />
         </EmptyMedia>
         <EmptyTitle>Live encerrada</EmptyTitle>
         <EmptyDescription>{description}</EmptyDescription>
