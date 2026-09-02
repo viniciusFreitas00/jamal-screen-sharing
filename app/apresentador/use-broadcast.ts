@@ -27,17 +27,24 @@ const STATUS = {
   requesting: {
     kind: "idle",
     title: "Solicitando permissões",
-    detail: "Escolha uma guia do Chrome para compartilhar.",
+    detail: "Escolha uma guia do Chrome para transmitir com som — janelas e telas vão sem áudio.",
   },
   live: {
     kind: "ready",
     title: "Transmitindo ao vivo",
     detail: "Compartilhe o link abaixo com seus espectadores.",
   },
-  withoutAudio: {
+  tabWithoutAudio: {
     kind: "idle",
     title: "Transmitindo sem áudio",
-    detail: "A fonte escolhida não tem som. Compartilhe uma guia do Chrome para transmitir o áudio.",
+    detail:
+      'Você não marcou "Compartilhar áudio da guia". Troque a tela e marque a caixa para transmitir o som.',
+  },
+  surfaceWithoutAudio: {
+    kind: "idle",
+    title: "Transmitindo sem áudio",
+    detail:
+      "Janelas e telas inteiras não têm áudio no navegador. Para transmitir som, compartilhe uma guia do Chrome.",
   },
   sourceUnchanged: {
     kind: "idle",
@@ -52,7 +59,9 @@ const STATUS = {
 } satisfies Record<string, Status>;
 
 function liveStatus(source: CaptureSource | null): Status {
-  return source?.hasAudio ? STATUS.live : STATUS.withoutAudio;
+  if (!source || source.hasAudio) return STATUS.live;
+
+  return source.isTab ? STATUS.tabWithoutAudio : STATUS.surfaceWithoutAudio;
 }
 
 export function useBroadcast() {

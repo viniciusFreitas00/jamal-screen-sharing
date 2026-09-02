@@ -2,6 +2,7 @@ import { VIDEO_PROFILE } from "@/lib/video-profile";
 
 export type CaptureSource = {
   video: MediaStreamTrack;
+  isTab: boolean;
   hasAudio: boolean;
 };
 
@@ -20,7 +21,7 @@ const DISPLAY_MEDIA_OPTIONS: DisplayMediaStreamOptions = {
   },
   audio: true,
   systemAudio: "exclude",
-  monitorTypeSurfaces: "exclude",
+  windowAudio: "exclude",
   selfBrowserSurface: "exclude",
   surfaceSwitching: "exclude",
 };
@@ -66,7 +67,11 @@ export function createScreenCapture(): ScreenCapture {
 
       if (context.state === "suspended") await context.resume();
 
-      return { video, hasAudio: audio.length > 0 };
+      return {
+        video,
+        isTab: video.getSettings().displaySurface === "browser",
+        hasAudio: audio.length > 0,
+      };
     },
 
     stop: () => {

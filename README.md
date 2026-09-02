@@ -33,7 +33,7 @@ components/
   ui/              componentes gerados pelo shadcn
   *.tsx            composições compartilhadas entre as rotas
 lib/
-  peer/            opções do peer, protocolo de mensagens, sender e qualidade de vídeo, registro de espectadores
+  peer/            opções, mensagens, sender e qualidade de vídeo, registro de espectadores
   screen-capture   sessão de captura: escolhe a fonte, troca de fonte e publica o áudio da guia
   display-media    constraints do getDisplayMedia que o lib.dom do TypeScript ainda não declara
   utils            cn(), usado por todos os componentes do shadcn
@@ -81,18 +81,42 @@ do WebRTC não chega de forma confiável quando a aba do espectador é fechada.
 `degradationPreference: "maintain-resolution"` porque texto legível importa mais que fluidez em
 compartilhamento de tela.
 
-### Só o áudio da guia compartilhada
+### Som só de guia, e por que não dá para fazer melhor
 
-Não há captura de microfone. O único som transmitido é o da fonte escolhida no seletor, e as
-constraints do `getDisplayMedia` existem para garantir isso:
+Não há captura de microfone, e o áudio do sistema nunca entra na transmissão. Isso significa que
+**guia é a única fonte que transmite som**: janelas e telas inteiras podem ser compartilhadas, mas
+vão só com vídeo.
 
-- `systemAudio: "exclude"` — nada do áudio do sistema entra na transmissão;
-- `displaySurface: "browser"` e `monitorTypeSurfaces: "exclude"` — o seletor abre no painel de guias
-  e a opção "Tela inteira" sai. Janelas continuam disponíveis, porque o Chrome não permite travar a
-  escolha em guia; quando a fonte não tem som, o apresentador vê o aviso de "transmitindo sem áudio";
+Não é uma escolha de produto, é o limite da plataforma. Capturar o som de um aplicativo específico
+é API de sistema operacional — no Windows 10 2004+, o *process loopback* do WASAPI. Nenhuma API web
+expõe isso. O que o `getDisplayMedia` entrega, por tipo de fonte:
+
+| Fonte     | Áudio disponível no navegador       |
+| --------- | ----------------------------------- |
+| Guia      | o áudio daquela guia, isolado       |
+| Janela    | nenhum, ou o áudio do sistema todo  |
+| Tela      | o áudio do sistema todo             |
+
+O Chrome 141 trouxe a constraint `windowAudio`, que aceita `"system"`, `"window"` e `"exclude"`.
+O valor `"window"` parece resolver o caso, mas não resolve: é um hint que o navegador pode ignorar
+sem violar a spec, e uma `MediaStreamTrack` não informa a origem do seu áudio. Se o Chrome nos
+devolvesse uma faixa numa janela compartilhada, não haveria como distinguir o som daquele aplicativo
+do mix do sistema inteiro. Vazar o áudio do sistema em silêncio é pior que não ter áudio, então a
+opção usada é `"exclude"` — a única verificável.
+
+As constraints, então:
+
+- `systemAudio: "exclude"` — o Chrome não oferece o áudio do sistema quando a fonte é uma tela;
+- `windowAudio: "exclude"` — nem quando é uma janela;
+- `displaySurface: "browser"` — o seletor abre no painel de guias, o caminho com som. Janelas e
+  telas seguem acessíveis, e o apresentador vê um aviso explicando por que a fonte dele saiu muda;
 - `selfBrowserSurface: "exclude"` — a própria aba do apresentador não aparece como opção;
-- `surfaceSwitching: "exclude"` — desliga o "Compartilhar esta guia em vez desta" da barra do Chrome,
-  deixando a troca de fonte só pelo botão da aplicação. Ver abaixo.
+- `surfaceSwitching: "exclude"` — desliga o "Compartilhar esta guia em vez desta" da barra do
+  Chrome, deixando a troca de fonte só pelo botão da aplicação. Ver abaixo.
+
+O aviso de "transmitindo sem áudio" tem duas versões, porque as causas têm consertos diferentes:
+numa guia, faltou marcar "Compartilhar áudio da guia"; numa janela ou tela, não há o que marcar.
+`CaptureSource.isTab` vem de `displaySurface` e é o que separa os dois casos.
 
 ### Trocar de fonte sem derrubar a transmissão
 
